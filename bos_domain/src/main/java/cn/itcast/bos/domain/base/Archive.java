@@ -37,5 +37,4 @@ public class Archive {
 
 	@OneToMany(mappedBy = "archive")
 	private Set<SubArchive> subArchives = new HashSet<>(); // 子档案
-
 }
