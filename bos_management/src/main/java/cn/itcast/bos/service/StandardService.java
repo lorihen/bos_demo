@@ -5,6 +5,8 @@ import cn.itcast.bos.domain.common.ResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
 public interface StandardService {
     /**
      * 保存收派标准
@@ -24,4 +26,10 @@ public interface StandardService {
      * @return
      */
     Page<Standard> findPageData(PageRequest pageRequest);
+
+    /**
+     * 查询全部
+     * @return
+     */
+    List<Standard> findAll();
 }

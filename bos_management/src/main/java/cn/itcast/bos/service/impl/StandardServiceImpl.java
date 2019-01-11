@@ -2,13 +2,13 @@ package cn.itcast.bos.service.impl;
 
 import cn.itcast.bos.dao.StandardDao;
 import cn.itcast.bos.domain.base.Standard;
-import cn.itcast.bos.domain.common.ResponseResult;
 import cn.itcast.bos.service.StandardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class StandardServiceImpl implements StandardService {
@@ -34,5 +34,10 @@ public class StandardServiceImpl implements StandardService {
     @Override
     public Page<Standard> findPageData(PageRequest pageRequest) {
         return standardDao.findAll(pageRequest);
+    }
+
+    @Override
+    public List<Standard> findAll() {
+        return standardDao.findAll();
     }
 }

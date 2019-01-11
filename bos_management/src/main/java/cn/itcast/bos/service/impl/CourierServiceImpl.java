@@ -8,6 +8,7 @@ import cn.itcast.bos.service.CourierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +33,7 @@ public class CourierServiceImpl implements CourierService {
     }
 
     @Override
-    public Page<Courier> findPageData(PageRequest pageRequest) {
-        return courierDao.findAll(pageRequest);
+    public Page<Courier> findPageData( Specification specification,PageRequest pageRequest) {
+        return courierDao.findAll(specification,pageRequest);
     }
 }

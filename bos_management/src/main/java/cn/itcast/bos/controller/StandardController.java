@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,7 +23,7 @@ public class StandardController {
     private StandardService standardService;
 
     @RequestMapping("/save")
-    public ResponseResult save(Standard standard){
+    public ResponseResult save(Standard standard) {
         try {
             standardService.save(standard);
             return ResponseResult.SUCCESS();
@@ -33,18 +34,17 @@ public class StandardController {
     }
 
     @RequestMapping("/pageQuery")
-    public Map pageQuery(int page,int rows){
+    public Map pageQuery(int page, int rows) {
         PageRequest pageRequest = PageRequest.of(page - 1, rows);
         Page<Standard> standards = standardService.findPageData(pageRequest);
-
         HashMap<Object, Object> map = new HashMap<>();
-        map.put("total",standards.getTotalElements());
-        map.put("rows",standards.getContent());
+        map.put("total", standards.getTotalElements());
+        map.put("rows", standards.getContent());
         return map;
     }
 
     @RequestMapping("/delete")
-    public ResponseResult delete(@RequestBody Standard[] deleteRows){
+    public ResponseResult delete(@RequestBody Standard[] deleteRows) {
         try {
             standardService.delete(deleteRows);
             return ResponseResult.SUCCESS();
@@ -52,5 +52,10 @@ public class StandardController {
             e.printStackTrace();
             return ResponseResult.FAIL();
         }
+    }
+
+    @RequestMapping("/findAll")
+    public List<Standard> findAll() {
+        return standardService.findAll();
     }
 }
