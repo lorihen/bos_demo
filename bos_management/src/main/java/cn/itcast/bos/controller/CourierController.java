@@ -49,7 +49,7 @@ public class CourierController {
             public Predicate toPredicate(Root<Courier> root, CriteriaQuery<?>
                     criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> list = new ArrayList<>();
-                //对数据进行分空判断并逐一添加
+                //对查询条件进行非空判断并逐一添加
                 if (StringUtils.isNotBlank(courier.getCourierNum())) {
                     Predicate predicate = criteriaBuilder.equal(
                             root.get("courierNum").as(String.class),

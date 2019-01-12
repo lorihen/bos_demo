@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -25,10 +27,8 @@ public class StandardServiceImpl implements StandardService {
     }
 
     @Override
-    public void delete(Standard[] standards) {
-        for (Standard standard : standards) {
-            standardDao.delete(standard);
-        }
+    public void delete( Standard[] standards) {
+        standardDao.deleteAll(Arrays.asList(standards));
     }
 
     @Override

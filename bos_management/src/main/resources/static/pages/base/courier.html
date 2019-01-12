@@ -216,7 +216,7 @@
 					url: "../../courier/pageQuery",
 					idField: 'id',
 					columns: columns,
-//					method: 'get',
+					//					method: 'get',
 					onDblClickRow: doDblClickRow
 				});
 
@@ -269,18 +269,18 @@
 
 				//对快递员进行条件查询按钮
 				$('#searchBtn').click(function() {
-					//$('#grid').datagrid('load', $('#searchForm').serializeJson());
+					$('#grid').datagrid('load',
+						$('#searchForm').serializeJson());
 
-					$('#grid').datagrid('load', {
-						courierNum: $('#courierNum').val(),
-						company: $('#company').val(),
-						type: $('#type').val(),
-						'standard.name':$('#standardName').val(),
-					});
+					//					$('#grid').datagrid('load', {
+					//						courierNum: $('#courierNum').val(),
+					//						company: $('#company').val(),
+					//						type: $('#type').val(),
+					//						'standard.name':$('#standardName').val(),
+					//					});
 					//关闭窗口
 					$('#searchWindow').window('close');
 				});
-
 			});
 
 			function doDblClickRow() {

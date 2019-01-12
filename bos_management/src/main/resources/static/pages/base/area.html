@@ -23,21 +23,69 @@
 			}
 
 			function doView() {
-				alert("修改...");
+				var rows = $("#grid").datagrid('getSelections');
+				if(rows.length != 1) {
+					//如果选择了不只一行数据
+					$.messager.alert("警告信息", "修改数据时,必须选中一行", "warning");
+				} else {
+					//只选中一行,提取选中行
+					var row = rows[0];
+					//回显数据
+					$('#areaForm').form('load', row);
+
+					//打开窗口
+					$('#addWindow').window('open');
+				}
 			}
 
 			function doDelete() {
-				alert("删除...");
-			}
+				//获取选中行数据
+				var deleteRows = $("#grid").datagrid('getSelections');
+				if(deleteRows.length > 0) {
+					//如果有选中数据,弹框提示
+					$.messager.confirm('提示信息', '确认删除', function(r) {
+						if(r) {
+							//执行删除
+							$.ajax({
+								url: "../../area/delete",
+								type: "post",
+								contentType: 'application/json; charset=UTF-8',
+								data: JSON.stringify(deleteRows),
+								success: function(data) {
+									//数据格式:success:true,message:"成功"
+									if(data.success) {
+										//删除成功
+										$.messager.show({
+											title: '提示信息',
+											msg: data.message,
+											timeout: 5000,
+											showType: 'slide'
+										});
 
-			//为导入按钮添加一键上传效果
-			$('#button-import').upload({
-				//默认name为file
-				action: '../../area_batchImport.action',
-				onComplete: function(response) {
-					alert("文件上传成功");
+										//清除表单数据
+										$("#areaForm").form('clear');
+
+										//重新刷新本页面(当前页)
+										$('#grid').datagrid("reload");
+									} else {
+										//删除失败
+										$.messager.show({
+											title: '警告信息',
+											msg: data.message,
+											timeout: 5000,
+											showType: 'slide'
+										});
+									}
+								}
+							})
+						}
+					});
 				}
-			}); 
+			}
+			
+			function doSearch() {
+				$("#searchWindow").window('open');
+			}
 
 			//工具栏
 			var toolbar = [{
@@ -59,6 +107,11 @@
 				id: 'button-import',
 				text: '导入',
 				iconCls: 'icon-redo'
+			}, {
+				id: 'button-search',
+				text: '查询',
+				iconCls: 'icon-search',
+				handler: doSearch
 			}];
 			// 定义列
 			var columns = [
@@ -114,10 +167,9 @@
 					pageList: [30, 50, 100],
 					pagination: true,
 					toolbar: toolbar,
-					url: "../../data/area.json",
+					url: "../../area/pageQuery",
 					idField: 'id',
 					columns: columns,
-					method:'get',
 					onDblClickRow: doDblClickRow
 				});
 
@@ -132,11 +184,98 @@
 					resizable: false
 				});
 
+				//为导入按钮添加一键上传效果
+				$('#button-import').upload({
+					//默认name为file
+					action: '../../area/batchImport',
+					onSelect: function() {
+						//选中文件后,关闭自动提交
+						this.autoSubmit = false;
+						//判定文件格式,以.xls或者.xlsx结尾
+						var filename = this.filename();
+						var regex = /(?:.xls|.xlsx)$/;
+						if(regex.test(filename)) {
+							//满足
+							this.submit();
+						} else {
+							$.messager.alert("警告", "只能上传.xls或.xlsx结尾的文件!", "warning");
+						}
+					},
+					onComplete: function(response) {
+						alert("文件上传成功");
+						$('#grid').datagrid("reload");
+					}
+				});
+
+				//对区域信息save按钮,添加click按钮
+				$('#save').click(function() {
+					//确认表单对象都通过校验
+					if($("#areaForm").form("validate")) {
+						//通过校验
+						$.post("../../area/save", $("#areaForm").serialize(), function(data) {
+							//数据格式:success:true,message:"成功"
+							if(data.success) {
+								//保存成功
+								$.messager.show({
+									title: '提示信息',
+									msg: data.message,
+									timeout: 5000,
+									showType: 'slide'
+								});
+
+								//清除表单数据
+								$("#areaForm").form('clear');
+
+								//关闭窗口
+								$('#addWindow').window('close');
+
+								//重新刷新本页面(当前页)
+								$('#grid').datagrid("reload");
+							}
+						})
+					} else {
+						$.messager.show({
+							title: '警告信息',
+							msg: "数据填写不正确,请重新填写",
+							timeout: 5000,
+							showType: 'slide'
+						});
+					}
+				});
+				
+				
+				//对快递员进行条件查询按钮
+				$('#searchBtn').click(function() {
+					$('#grid').datagrid('load', $('#searchForm').serializeJson());
+
+					//关闭窗口
+					$('#searchWindow').window('close');
+				});
+
 			});
 
 			function doDblClickRow() {
 				alert("双击表格数据...");
 			}
+			
+			$.fn.serializeJson = function() {
+				var serializeObj = {};
+				var array = this.serializeArray();
+				var str = this.serialize();
+				$(array).each(function() { // 遍历数组的每个元素 
+					if(serializeObj[this.name]) { // 判断对象中是否已经存在 name，如果存在name 
+						if($.isArray(serializeObj[this.name])) {
+							serializeObj[this.name].push(this.value); // 追加一个值 hobby : ['音乐','体育'] 
+						} else {
+							// 将元素变为 数组 ，hobby : ['音乐','体育'] 
+							serializeObj[this.name] = [serializeObj[this.name], this.value];
+						}
+					} else {
+						serializeObj[this.name] = this.value; // 如果元素name不存在，添加一个属性 name:value 
+					}
+				});
+				return serializeObj;
+			};
 		</script>
 	</head>
 
@@ -152,10 +291,13 @@
 			</div>
 
 			<div region="center" style="overflow:auto;padding:5px;" border="false">
-				<form>
+				<form id="areaForm">
 					<table class="table-edit" width="80%" align="center">
 						<tr class="title">
-							<td colspan="2">区域信息</td>
+							<td colspan="2">区域信息
+								<!--隐藏id信息-->
+								<input type="hidden" name="id">
+							</td>
 						</tr>
 						<tr>
 							<td>省</td>
